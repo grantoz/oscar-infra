@@ -1,29 +1,71 @@
 name: 'oscar'
 services:
   postgres:
+    container_name: postgres
     image: postgres:alpine
     environment:
       POSTGRES_DB: oscar
       POSTGRES_PASSWORD: pass
       POSTGRES_USER: user
     ports:
-      - 5442:5432
+      - 5432:5432
     restart: on-failure:3
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      # - pg_data:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql/data
+      # TODO - make this a bind mount of local folder
+
+  # redis:
+  #   image: redis/redis-stack-server:latest
+  #   container_name: redis
+  #   command: ["redis-server", "--save", "1", "1", "--loglevel", "warning", "--protected-mode", "no"]
+  #   volumes:
+  #     - ./data/redis:/data
+  #   ports:
+  #     - 6379:6379
 
   redis:
     image: redis:alpine
-    command: redis-server
-      #    volumes:
-      # - redis:/var/lib/redis
-      # - redis-config:/usr/local/etc/redis/redis.conf
+    command: ["redis-server", "--save", "1", "1", "--loglevel", "warning"]
+    volumes:
+      - ./data/redis:/data
     ports:
-      - 6389:6379
-#    networks:
-#      - redis-network
-#
-#
-volumes:
-  pg_data:
-    name: oscar_pg_data
+      - 6379:6379
+    # networks:
+    #   - redis-network
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    # restart: unless-stopped
+    volumes:
+      - ./data/mailpit:/data
+    ports:
+      - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1    
+    
+# volumes:
+#  pg_data:
+#    name: oscar_pg_data
+
+  lgtm:
+    image: docker.io/grafana/otel-lgtm:0.8.1
+    container_name: lgtm
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - "./data/grafana:/data/grafana"
+      - "./data/prometheus:/data/prometheus"
+      - "./data/loki:/data/loki"
+    environment:
+      - GF_PATHS_DATA=/data/grafana
+    stdin_open: true
+    tty: true
+
