@@ -9,20 +9,8 @@ services:
       POSTGRES_USER: user
     ports:
       - 5432:5432
-    restart: on-failure:3
     volumes:
-      # - pg_data:/var/lib/postgresql/data
       - ./data/postgres:/var/lib/postgresql/data
-      # TODO - make this a bind mount of local folder
-
-  # redis:
-  #   image: redis/redis-stack-server:latest
-  #   container_name: redis
-  #   command: ["redis-server", "--save", "1", "1", "--loglevel", "warning", "--protected-mode", "no"]
-  #   volumes:
-  #     - ./data/redis:/data
-  #   ports:
-  #     - 6379:6379
 
   redis:
     image: redis:alpine
@@ -31,8 +19,6 @@ services:
       - ./data/redis:/data
     ports:
       - 6379:6379
-    # networks:
-    #   - redis-network
 
   mailpit:
     image: axllent/mailpit
@@ -49,10 +35,6 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1    
     
-# volumes:
-#  pg_data:
-#    name: oscar_pg_data
-
   lgtm:
     image: docker.io/grafana/otel-lgtm:0.8.1
     container_name: lgtm
