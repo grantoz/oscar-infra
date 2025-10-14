@@ -2,7 +2,7 @@ name: 'oscar'
 services:
   postgres:
     container_name: postgres
-    image: postgres:alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_DB: oscar
       POSTGRES_PASSWORD: pass
@@ -10,7 +10,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/postgres:/var/lib/postgresql
 
   redis:
     image: redis:alpine
@@ -33,21 +33,21 @@ services:
       MP_MAX_MESSAGES: 5000
       MP_DATABASE: /data/mailpit.db
       MP_SMTP_AUTH_ACCEPT_ANY: 1
-      MP_SMTP_AUTH_ALLOW_INSECURE: 1    
-    
-  lgtm:
-    image: docker.io/grafana/otel-lgtm:0.8.1
-    container_name: lgtm
-    ports:
-      - "3000:3000"
-      - "4317:4317"
-      - "4318:4318"
-    volumes:
-      - "./data/grafana:/data/grafana"
-      - "./data/prometheus:/data/prometheus"
-      - "./data/loki:/data/loki"
-    environment:
-      - GF_PATHS_DATA=/data/grafana
-    stdin_open: true
-    tty: true
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+  # lgtm:
+  #   image: docker.io/grafana/otel-lgtm:0.8.1
+  #   container_name: lgtm
+  #   ports:
+  #     - "3000:3000"
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   volumes:
+  #     - "./data/grafana:/data/grafana"
+  #     - "./data/prometheus:/data/prometheus"
+  #     - "./data/loki:/data/loki"
+  #   environment:
+  #     - GF_PATHS_DATA=/data/grafana
+  #   stdin_open: true
+  #   tty: true
 
