@@ -35,19 +35,31 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
-  # lgtm:
-  #   image: docker.io/grafana/otel-lgtm:0.8.1
-  #   container_name: lgtm
-  #   ports:
-  #     - "3000:3000"
-  #     - "4317:4317"
-  #     - "4318:4318"
-  #   volumes:
-  #     - "./data/grafana:/data/grafana"
-  #     - "./data/prometheus:/data/prometheus"
-  #     - "./data/loki:/data/loki"
-  #   environment:
-  #     - GF_PATHS_DATA=/data/grafana
-  #   stdin_open: true
-  #   tty: true
+  lgtm:
+    image: docker.io/grafana/otel-lgtm:latest
+    container_name: lgtm
+    init: true
+    ports:
+      - "3030:3000"
+      - "3200:3200"
+      - "4040:4040"
+      - "4317:4317"
+      - "4318:4318"
+      - "9090:9090"
+    volumes:
+      - ./data/grafana:/data/grafana
+      - ./data/prometheus:/data/prometheus
+      - ./data/loki:/data/loki
+    environment:
+      GF_PATHS_DATA: /data/grafana
+      CONTAINER_RUNTIME: docker
+      OTEL_COLLECTOR_DEBUG_EXPORTER: ${OTEL_COLLECTOR_DEBUG_EXPORTER:-}
+    env_file:
+      - path: .env
+        required: false
+    stdin_open: true
+    tty: true
+    # OBI eBPF auto-instrumentation (Linux kernel 5.8+ with BTF). Enable with ENABLE_OBI=true in .env:
+    # pid: host
+    # privileged: true
 
